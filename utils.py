@@ -1,0 +1,39 @@
+import random
+from collections import deque
+from itertools import count
+
+
+def rule_asc_len(n, l):
+    # produce all partitions of the integer n into at most l parts
+
+    a = [0] * (n + 1)
+    a[1] = n
+
+    k = 1
+    while k:
+        x = a[k - 1] + 1
+        y = a[k] - 1
+        k -= 1
+        while x <= y and k < l - 1:
+            a[k] = x
+            y -= x
+            k += 1
+        a[k] = x + y
+
+        yield a[:k + 1]
+
+
+def count_partitions(n, l):
+    # count the number of partitions of the integer n into at most l parts
+    gen = rule_asc_len(n, l)
+    return sum(1 for _ in gen)
+
+
+def random_partition_uniform(n, l):
+    # produce a random partition of the integer n into at most l parts
+    n_partitions = count_partitions(n, l)
+    parts = rule_asc_len(n, l)
+    which = random.randint(1, n_partitions)
+    for i in range(which - 1):
+        next(parts)
+    return next(parts)
