@@ -1,11 +1,8 @@
-import numpy as np
 import time
-import math
 import itertools
-import random
 from sympy.utilities.iterables import multiset_permutations
 from scipy.signal import deconvolve
-from utils import rule_asc_len, random_partition_uniform
+from utils import *
 
 
 def enumerate_sphere(n, d):
@@ -16,9 +13,9 @@ def enumerate_sphere(n, d):
 
     for l1 in parts_pos:
         for l2 in parts_neg:
-            if len(l1) + len(l2) > (n+1):
+            if len(l1) + len(l2) > (n + 1):
                 continue
-            cat = l1 + [-c for c in l2] + [0] * ((n+1) - len(l1) - len(l2))
+            cat = l1 + [-c for c in l2] + [0] * ((n + 1) - len(l1) - len(l2))
 
             vecs = multiset_permutations(cat)
             for vec in vecs:
@@ -45,13 +42,24 @@ def random_vector(q_, n_):
     return v_
 
 
-def sample_uniformly_An(n, t):
-    # sample uniformly a vector of burst weight t and length n+1.
+def sample_non_uniformly_An(n, t):
+    # sample naively a vector of burst weight t and length n+1.
     lambda_p = random_partition_uniform(t, n)
     lambda_n = [-i for i in random_partition_uniform(t, (n + 1) - len(lambda_p))]
     zeros = [0] * ((n + 1) - len(lambda_p) - len(lambda_n))
     vec = lambda_p + lambda_n + zeros
     random.shuffle(vec)
+
+    return vec
+
+
+def sample_uniformly_An(n, t):
+    # sample uniformly a vector of burst weight t and length n+1.
+    l_squared = gen_lambda_squared()
+    keys = [tuple(lp,ln) for lp,ln in l_squared]
+    num_perms = dict.fromkeys(keys)
+    for lp_ln in num_perms.keys():
+        num_perms[lp_ln] = num_multiset_permutations(lp_ln[0]) * num_multiset_permutations(lp_ln[1])
 
     return vec
 
