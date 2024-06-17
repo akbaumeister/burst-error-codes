@@ -52,4 +52,5 @@ def gen_lambda_squared(n, t):
     for l_p in gen_pos:
         for l_n in gen_neg:
             if len(l_p) + len(l_n) <= n+1:
-                yield l_p, [-i for i in l_n]
+                yield l_p + [-i for i in l_n]
+        gen_neg = rule_asc_len(t, n)

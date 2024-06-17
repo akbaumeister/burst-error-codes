@@ -27,20 +27,22 @@ import matplotlib.pyplot as plt
 
 # test uniform sampling
 t = 3
-n = 4
+n = 5
 
 keys = [str(e) for e in enumerate_sphere(n, t)]
 vecs = dict.fromkeys(keys, 0)
 
-for i in range(100000):
-    v = sample_uniformly_An(n, t)
+v = sample_uniformly_An(n, t)
+for i in range(10000000):
+    v = sample_non_uniformly_An(n, t)
     vecs[str(v)] += 1
+    #vecs[str(next(v))] += 1
 
-plt.bar(vecs.keys(), vecs.values())
+plt.bar(vecs.keys(), vecs.values(),  width=1.0)
 
 #for export
-# plt.axis('off')
-# plt.savefig('sampling_nonuniform_n5_t3.png', bbox_inches='tight', pad_inches=0, dpi=1200)
+plt.axis('off')
+plt.savefig('sampling_nonuniform_n5_t3.png', bbox_inches='tight', pad_inches=0, dpi=1200)
 
 y_pos = range(len(keys))
 plt.xticks(y_pos, vecs.keys(), rotation=90)

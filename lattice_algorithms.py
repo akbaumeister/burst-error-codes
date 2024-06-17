@@ -1,7 +1,9 @@
+import random
 import time
 import itertools
 from sympy.utilities.iterables import multiset_permutations
 from scipy.signal import deconvolve
+from scipy.special import binom
 from utils import *
 
 
@@ -54,14 +56,29 @@ def sample_non_uniformly_An(n, t):
 
 
 def sample_uniformly_An(n, t):
-    # sample uniformly a vector of burst weight t and length n+1.
-    l_squared = gen_lambda_squared()
-    keys = [tuple(lp,ln) for lp,ln in l_squared]
-    num_perms = dict.fromkeys(keys)
-    for lp_ln in num_perms.keys():
-        num_perms[lp_ln] = num_multiset_permutations(lp_ln[0]) * num_multiset_permutations(lp_ln[1])
+    # generator to sample uniformly a vector of burst weight t and length n+1.
+    # init
+    l_squared = gen_lambda_squared(n, t)
+    keys = [tuple(l) for l in l_squared]
+    PMF = dict.fromkeys(keys)
+    for lp_ln in PMF.keys():
+        PMF[lp_ln] = num_multiset_permutations(lp_ln)
+        num_zeros = (n + 1) - len(lp_ln)
+        PMF[lp_ln] *= binom(n + 1, num_zeros)
+    # normalize dictionary
+    factor = 1.0 / sum(PMF.values())
+    for k in PMF:
+        PMF[k] = PMF[k] * factor
 
-    return vec
+    # sampling
+    while True:
+        sample = random.choices(list(PMF.keys()), weights=PMF.values(), k=1)
+        vec = sample[0]
+        num_zeros = (n + 1) - len(vec)
+        v = list(vec) + [0]*num_zeros
+        random.shuffle(v)
+        yield v
+
 
 
 def closest_qlattice_point(q_, v):
