@@ -1,52 +1,32 @@
+import numpy as np
 import scipy.special
 from utils import *
 from lattice_algorithms import *
 import matplotlib.pyplot as plt
 
+qs = range(8)
+ns = range(8)
 
-# c = [2,0,2,0]
-# wt, elapsed = burst_weight(q, c)
-# print('An_smallest_rep, Computed in [s]', round(elapsed), ', vector:', c, ', burst weight:', wt)
-# wt2, elapsed = burst_weight(q, c, 'brute_force')
-# print('Brute force, Computed in [s]', round(elapsed), ', vector:', c, ', burst weight:', wt2)
+#records = np.zeros((100, 100), dtype=int)
+records = np.load('records_n_q.npy')
 
-#
-# mask = [-1, 1]
-# for i in range(1000):
-#     c = random_vector(q, n)
-#     print('Random vector:', c, 'Convolved:', np.convolve(c, mask))
-#     wt, elapsed = burst_weight(q, c)
-#     print(wt)
-#     #print('An_smalles_rep, Computed in [s]', round(elapsed), ', vector:', c, ', burst weight:', wt)
-#     wt2, elapsed = burst_weight(q, c, 'brute_force')
-#     print(wt2)
-#     #print('Brute force, Computed in [s]', round(elapsed), ', vector:', c, ', burst weight:', wt2)
-#     if wt != wt2:
-#         print(c, np.convolve(c, mask), wt, wt2)
-#         raise ValueError
+for q in qs:
+    for n in ns:
+        if records[n, q] != 0:
+            continue
+        print('processing q =', q, 'n =', n)
+        highest = 0
+        S = enumerate_burst_vectors(n, q)
+        for i in range(q**n-1):
+            vec = next(S)
+            wt = burst_weight(q, vec)[0]
+            if wt > highest:
+                highest = wt
+        records[n, q] = highest
 
-# test uniform sampling
-t = 3
-n = 5
+np.save('records_n_q', records)
 
-keys = [str(e) for e in enumerate_sphere(n, t)]
-vecs = dict.fromkeys(keys, 0)
-
-v = sample_uniformly_An(n, t)
-for i in range(10000000):
-    v = sample_non_uniformly_An(n, t)
-    vecs[str(v)] += 1
-    #vecs[str(next(v))] += 1
-
-plt.bar(vecs.keys(), vecs.values(),  width=1.0)
-
-#for export
-plt.axis('off')
-plt.savefig('sampling_nonuniform_n5_t3.png', bbox_inches='tight', pad_inches=0, dpi=1200)
-
-y_pos = range(len(keys))
-plt.xticks(y_pos, vecs.keys(), rotation=90)
-
+plt.imshow(records, cmap='hot', interpolation='nearest')
 plt.show()
 
-# print(random_partition_weighted(3,3,20))
+np.savetxt('records_textdump', records, fmt='%d', delimiter='&')

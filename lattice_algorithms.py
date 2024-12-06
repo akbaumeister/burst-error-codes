@@ -6,7 +6,6 @@ from scipy.signal import deconvolve
 from scipy.special import binom
 from utils import *
 
-
 def enumerate_sphere(n, d):
     # enumerate all points over the A_n lattice which have distance d to the central point [0]*(n+1)
 
@@ -24,6 +23,15 @@ def enumerate_sphere(n, d):
                 yield vec
         parts_neg = rule_asc_len(d, n)
 
+def enumerate_burst_vectors(n,q):
+
+    max_num = (q**n)
+    num = 0
+    while num <= max_num:
+        vec = to_base(num, q)
+        vec = [0]*(n-len(vec)) + vec
+        num += 1
+        yield vec
 
 def burst_to_an(v):
     return np.convolve(v, [-1, 1])
@@ -113,7 +121,7 @@ def closest_qlattice_point(q_, v):
 
 
 def burst_weight(q, v, algorithm='An_smallest_rep'):
-    assert all(0 <= i < q for i in v), 'burst_weight(q, v): the vector can only consist of elements of the field Fq'
+    assert all(0 <= i < q for i in v), 'burst_weight(q, v): the vector can only consist of elements of Z/Zq'
     start = time.time()
     n = len(v)
 

@@ -23,6 +23,16 @@ def rule_asc_len(n, l):
         yield a[:k + 1]
 
 
+def to_base(number, base):
+    # represent number in base 'base', returned as little endian list with each entry one coefficient
+
+    digits = []
+    while number:
+        digits.append(number % base)
+        number //= base
+    return list(reversed(digits))
+
+
 def count_partitions(n, l):
     # count the number of partitions of the integer n into at most l parts
     gen = rule_asc_len(n, l)
@@ -42,7 +52,7 @@ def random_partition_uniform(n, l):
 def num_multiset_permutations(vec):
     _, counts = np.unique(vec, return_counts=True)
     denom = np.prod([math.factorial(i) for i in counts])
-    return math.factorial(len(vec))//denom
+    return math.factorial(len(vec)) // denom
 
 
 def gen_lambda_squared(n, t):
@@ -51,6 +61,6 @@ def gen_lambda_squared(n, t):
 
     for l_p in gen_pos:
         for l_n in gen_neg:
-            if len(l_p) + len(l_n) <= n+1:
+            if len(l_p) + len(l_n) <= n + 1:
                 yield l_p + [-i for i in l_n]
         gen_neg = rule_asc_len(t, n)
